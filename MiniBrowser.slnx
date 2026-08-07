@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MiniBrowser/MiniBrowser.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MiniBrowser.Tests/MiniBrowser.Tests.csproj" />
+  </Folder>
+</Solution>
