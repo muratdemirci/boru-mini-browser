@@ -1,0 +1,283 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MiniBrowser.ViewModels"
+        xmlns:controls="using:MiniBrowser.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="MiniBrowser.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding WindowTitle}"
+        Width="1200" Height="800"
+        MinWidth="800" MinHeight="600">
+
+    <Window.Styles>
+        <Style Selector="Button.toolbar">
+            <Setter Property="MinWidth" Value="36" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Border.tab">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="MaxWidth" Value="180" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+        </Style>
+
+        <Style Selector="Border.tab.active">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+        </Style>
+
+        <Style Selector="Button.tabbody">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="MinWidth" Value="60" />
+            <Setter Property="MaxWidth" Value="140" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.tabclose">
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="2,0,4,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+
+        <Style Selector="Button.tabnew">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+
+        <Menu Grid.Row="0" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+            <MenuItem Header="File">
+                <MenuItem Header="Downloads"
+                          AutomationProperties.AutomationId="MenuDownloadsItem"
+                          Click="OnOpenDownloads" />
+                <Separator />
+                <MenuItem Header="Settings"
+                          AutomationProperties.AutomationId="MenuSettingsItem"
+                          Click="OnOpenSettings" />
+                <Separator />
+                <MenuItem Header="Close Window"
+                          AutomationProperties.AutomationId="MenuCloseWindowItem"
+                          Click="OnCloseWindow" />
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Find in page"
+                          AutomationProperties.AutomationId="MenuFindItem"
+                          Command="{Binding OpenFindCommand}" />
+                <Separator />
+                <MenuItem Header="Zoom In"
+                          AutomationProperties.AutomationId="MenuZoomInItem"
+                          Command="{Binding ZoomInCommand}" />
+                <MenuItem Header="Zoom Out"
+                          AutomationProperties.AutomationId="MenuZoomOutItem"
+                          Command="{Binding ZoomOutCommand}" />
+                <MenuItem Header="Reset Zoom"
+                          AutomationProperties.AutomationId="MenuResetZoomItem"
+                          Command="{Binding ResetZoomCommand}" />
+                <Separator />
+                <MenuItem Header="Developer Tools"
+                          AutomationProperties.AutomationId="MenuDevToolsItem"
+                          Command="{Binding OpenDevToolsCommand}" />
+                <Separator />
+                <MenuItem Header="History"
+                          AutomationProperties.AutomationId="MenuHistoryItem"
+                          Click="OnOpenHistory" />
+                <MenuItem Header="Bookmarks"
+                          AutomationProperties.AutomationId="MenuBookmarksItem"
+                          Click="OnOpenBookmarks" />
+            </MenuItem>
+        </Menu>
+
+        <Border Grid.Row="1"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="6,4">
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Right" Classes="tabnew"
+                        Content="+" ToolTip.Tip="New tab"
+                        AutomationProperties.AutomationId="NewTabButton"
+                        Command="{Binding NewTabCommand}" />
+
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding Tabs}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:CompileBindings="False">
+                                <Border Classes="tab" Classes.active="{Binding IsActive}">
+                                    <DockPanel LastChildFill="True">
+                                        <Button DockPanel.Dock="Right" Classes="tabclose"
+                                                Content="✕" ToolTip.Tip="Close tab"
+                                                AutomationProperties.AutomationId="TabCloseButton"
+                                                Command="{Binding $parent[Window].DataContext.CloseTabCommand}"
+                                                CommandParameter="{Binding}" />
+                                        <Button DockPanel.Dock="Left" Classes="tabbody"
+                                                AutomationProperties.AutomationId="TabSelectButton"
+                                                Command="{Binding $parent[Window].DataContext.SelectTabCommand}"
+                                                CommandParameter="{Binding}">
+                                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                        </Button>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8,6">
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Left" Classes="toolbar"
+                        Content="←" ToolTip.Tip="Back"
+                        Command="{Binding GoBackCommand}"
+                        IsEnabled="{Binding ActiveTab.CanGoBack}" />
+                <Button DockPanel.Dock="Left" Classes="toolbar"
+                        Content="→" ToolTip.Tip="Forward"
+                        Command="{Binding GoForwardCommand}"
+                        IsEnabled="{Binding ActiveTab.CanGoForward}" />
+
+                <!-- Single slot that swaps between Reload and Stop based on load state. -->
+                <Grid DockPanel.Dock="Left" Width="40" Margin="0,0,4,0">
+                    <Button Classes="toolbar" Margin="0,0,0,0"
+                            Content="↻" ToolTip.Tip="Reload"
+                            Command="{Binding ReloadCommand}"
+                            IsVisible="{Binding ActiveTab.IsNotLoading}" />
+                    <Button Classes="toolbar" Margin="0,0,0,0"
+                            Content="✕" ToolTip.Tip="Stop"
+                            Command="{Binding StopCommand}"
+                            IsVisible="{Binding ActiveTab.IsLoading}" />
+                </Grid>
+
+                <Button DockPanel.Dock="Right" Classes="toolbar"
+                        Content="Bookmarks" ToolTip.Tip="Bookmarks"
+                        AutomationProperties.AutomationId="OpenBookmarksButton"
+                        Click="OnOpenBookmarks" />
+
+                <Button DockPanel.Dock="Right" Classes="toolbar"
+                        Content="History" ToolTip.Tip="History"
+                        AutomationProperties.AutomationId="OpenHistoryButton"
+                        Click="OnOpenHistory" />
+
+                <Grid DockPanel.Dock="Right" Width="40" Margin="0,0,4,0">
+                    <Button Classes="toolbar" Margin="0,0,0,0"
+                            Content="☆" ToolTip.Tip="Add bookmark"
+                            AutomationProperties.AutomationId="AddBookmarkButton"
+                            Command="{Binding ToggleBookmarkCommand}"
+                            IsVisible="{Binding !IsCurrentBookmarked}"
+                            IsEnabled="{Binding CanBookmark}" />
+                    <Button Classes="toolbar" Margin="0,0,0,0"
+                            Content="★" ToolTip.Tip="Remove bookmark"
+                            AutomationProperties.AutomationId="RemoveBookmarkButton"
+                            Command="{Binding ToggleBookmarkCommand}"
+                            IsVisible="{Binding IsCurrentBookmarked}"
+                            IsEnabled="{Binding CanBookmark}" />
+                </Grid>
+
+                <TextBox x:Name="AddressBox"
+                         KeyDown="OnAddressKeyDown"
+                         GotFocus="OnAddressGotFocus"
+                         Text="{Binding AddressText}"
+                         PlaceholderText="Enter a web address"
+                         VerticalContentAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+<Border Grid.Row="3"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8,6"
+                IsVisible="{Binding IsFindBarVisible}">
+            <DockPanel LastChildFill="True">
+                <Button DockPanel.Dock="Right" Classes="toolbar"
+                        Content="✕" ToolTip.Tip="Close find bar (Esc)"
+                        AutomationProperties.AutomationId="CloseFindBarButton"
+                        Command="{Binding CloseFindCommand}" />
+                <Button DockPanel.Dock="Right" Classes="toolbar"
+                        Content="↑" ToolTip.Tip="Previous (Shift+Enter)"
+                        AutomationProperties.AutomationId="FindPreviousButton"
+                        Command="{Binding FindPreviousCommand}" />
+                <Button DockPanel.Dock="Right" Classes="toolbar"
+                        Content="↓" ToolTip.Tip="Next (Enter)"
+                        AutomationProperties.AutomationId="FindNextButton"
+                        Command="{Binding FindNextCommand}" />
+                <TextBlock DockPanel.Dock="Right"
+                           Text="{Binding FindStatus}"
+                           VerticalAlignment="Center"
+                           MinWidth="70" Margin="0,0,8,0" />
+                <TextBox x:Name="FindBox"
+                         Text="{Binding FindText, Mode=TwoWay}"
+                         PlaceholderText="Find in page"
+                         VerticalContentAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="3"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8,6">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding ActiveTab.Url}" VerticalAlignment="Center" Margin="4,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <ProgressBar Grid.Row="4"
+                     IsIndeterminate="True"
+                     IsVisible="{Binding ActiveTab.IsLoading}"
+                     Height="3" MinHeight="3" MaxHeight="3"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Top" />
+
+        <Grid Grid.Row="5">
+            <ItemsControl ItemsSource="{Binding Tabs}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False">
+                        <controls:BrowserView IsVisible="{Binding IsActive}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+    </Grid>
+
+</Window>
