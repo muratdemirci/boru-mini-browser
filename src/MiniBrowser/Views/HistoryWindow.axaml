@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MiniBrowser.ViewModels"
+        xmlns:c="using:Avalonia.Data.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="560"
+        x:Class="MiniBrowser.Views.HistoryWindow"
+        x:DataType="vm:HistoryViewModel"
+        Title="History"
+        Width="480" Height="560"
+        MinWidth="360" MinHeight="300">
+
+    <Window.Styles>
+        <Style Selector="Button.entry">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel LastChildFill="True">
+
+        <TextBox DockPanel.Dock="Top"
+                 Margin="8,8,8,4"
+                 AutomationProperties.AutomationId="HistorySearchBox"
+                 PlaceholderText="Search history"
+                 Text="{Binding SearchText}" />
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="8,4,8,8" Spacing="8">
+            <TextBlock Text="{Binding StatusMessage}"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static c:ObjectConverters.IsNotNull}}" />
+
+            <Border IsVisible="{Binding IsClearConfirmVisible}"
+                    Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    CornerRadius="3" Padding="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Clear all browsing history?" VerticalAlignment="Center" />
+                    <Button Content="Cancel" Command="{Binding CancelClearCommand}" />
+                    <Button Content="Clear" Command="{Binding ConfirmClearCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Button Content="Clear History"
+                    HorizontalAlignment="Right"
+                    AutomationProperties.AutomationId="ClearHistoryButton"
+                    IsVisible="{Binding !IsClearConfirmVisible}"
+                    Command="{Binding ClearHistoryCommand}" />
+        </StackPanel>
+
+        <ScrollViewer Margin="0,4,0,0">
+            <ItemsControl ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False">
+                        <StackPanel Margin="0,0,0,8">
+                            <TextBlock Text="{Binding Title}"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                       Margin="8,6,0,2" />
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:CompileBindings="False">
+                                        <Button Classes="entry"
+                                                AutomationProperties.AutomationId="HistoryEntryButton"
+                                                AutomationProperties.Name="{Binding AutomationName}"
+                                                Command="{Binding $parent[Window].DataContext.OpenCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding Url}" FontSize="11"
+                                                               Opacity="0.6" TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1" Text="{Binding DisplayTime}"
+                                                           Opacity="0.6" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>
