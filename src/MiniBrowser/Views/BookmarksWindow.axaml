@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MiniBrowser.ViewModels"
+        xmlns:c="using:Avalonia.Data.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="480"
+        x:Class="MiniBrowser.Views.BookmarksWindow"
+        x:DataType="vm:BookmarksViewModel"
+        Title="Bookmarks"
+        Width="480" Height="480"
+        MinWidth="360" MinHeight="300">
+
+    <Window.Styles>
+        <Style Selector="Button.entry">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel LastChildFill="True">
+
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="8,8,8,4"
+                   Text="{Binding StatusMessage}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                   IsVisible="{Binding StatusMessage, Converter={x:Static c:ObjectConverters.IsNotNull}}" />
+
+        <ScrollViewer Margin="4,0,4,0">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False">
+                        <Grid ColumnDefinitions="*,Auto" Margin="4,1">
+                            <Button Classes="entry"
+                                    AutomationProperties.AutomationId="BookmarkEntryButton"
+                                    AutomationProperties.Name="{Binding AutomationName}"
+                                    Command="{Binding $parent[Window].DataContext.OpenCommand}"
+                                    CommandParameter="{Binding}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Url}" FontSize="11"
+                                               Opacity="0.6" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="1"
+                                    Classes="entry"
+                                    Content="Remove"
+                                    AutomationProperties.AutomationId="BookmarkRemoveButton"
+                                    VerticalAlignment="Center"
+                                    Margin="4,0,0,0"
+                                    Command="{Binding $parent[Window].DataContext.RemoveCommand}"
+                                    CommandParameter="{Binding}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>
