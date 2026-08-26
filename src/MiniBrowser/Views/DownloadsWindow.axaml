@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MiniBrowser.ViewModels"
+        xmlns:c="using:Avalonia.Data.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="480"
+        x:Class="MiniBrowser.Views.DownloadsWindow"
+        x:DataType="vm:DownloadsViewModel"
+        Title="Downloads"
+        Width="560" Height="480"
+        MinWidth="420" MinHeight="300">
+
+    <Window.Styles>
+        <Style Selector="Button.entry">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel LastChildFill="True">
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="8,4,8,8" Spacing="8">
+            <TextBlock Text="{Binding StatusMessage}"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static c:ObjectConverters.IsNotNull}}" />
+
+            <Button Content="Clear completed"
+                    HorizontalAlignment="Right"
+                    AutomationProperties.AutomationId="ClearCompletedDownloadsButton"
+                    Command="{Binding ClearCompletedCommand}" />
+        </StackPanel>
+
+        <ScrollViewer Margin="0,4,0,0">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False">
+                        <Button Classes="entry"
+                                AutomationProperties.AutomationId="DownloadEntryButton"
+                                AutomationProperties.Name="{Binding FileName}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="2">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="{Binding FileName}"
+                                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="1" Text="{Binding StatusText}"
+                                                   Opacity="0.7" Margin="8,0,0,0" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding Url}"
+                                               FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding ProgressText}"
+                                               FontSize="11" Opacity="0.6" />
+                                    <ProgressBar Height="4" Minimum="0" Maximum="100"
+                                                 Value="{Binding Progress}"
+                                                 IsIndeterminate="{Binding !IsDeterminateProgress}"
+                                                 IsVisible="{Binding IsActive}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Button Content="Open"
+                                                AutomationProperties.AutomationId="OpenDownloadButton"
+                                                Command="{Binding $parent[Window].DataContext.OpenCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsEnabled="{Binding CanOpen}" />
+                                        <Button Content="Show in folder"
+                                                AutomationProperties.AutomationId="ShowInFolderButton"
+                                                Command="{Binding $parent[Window].DataContext.ShowInFolderCommand}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="Cancel"
+                                                AutomationProperties.AutomationId="CancelDownloadButton"
+                                                Command="{Binding $parent[Window].DataContext.CancelCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsVisible="{Binding IsCancelOrRemoveVisible}"
+                                                IsEnabled="{Binding CanCancel}" />
+                                        <Button Content="Retry"
+                                                AutomationProperties.AutomationId="RetryDownloadButton"
+                                                Command="{Binding $parent[Window].DataContext.RetryCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsVisible="{Binding HasFailed}" />
+                                        <Button Content="Remove"
+                                                AutomationProperties.AutomationId="RemoveDownloadButton"
+                                                Command="{Binding $parent[Window].DataContext.RemoveCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>
