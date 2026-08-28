@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MiniBrowser.ViewModels"
+        xmlns:c="using:Avalonia.Data.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="480"
+        x:Class="MiniBrowser.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Settings"
+        Width="520" Height="480"
+        MinWidth="420" MinHeight="380">
+
+    <DockPanel LastChildFill="True">
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="8,4,8,8" Spacing="8">
+            <TextBlock Text="{Binding StatusMessage}"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       IsVisible="{Binding StatusMessage, Converter={x:Static c:ObjectConverters.IsNotNull}}" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Content="Reset defaults"
+                        AutomationProperties.AutomationId="ResetSettingsButton"
+                        Command="{Binding ResetDefaultsCommand}" />
+                <Button Content="Cancel"
+                        AutomationProperties.AutomationId="CancelSettingsButton"
+                        Command="{Binding CancelCommand}" />
+                <Button Content="Save"
+                        AutomationProperties.AutomationId="SaveSettingsButton"
+                        Classes="accent"
+                        Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </StackPanel>
+
+        <ScrollViewer>
+            <StackPanel Margin="12,12,12,8" Spacing="12">
+
+                <TextBlock Text="Appearance"
+                           FontWeight="SemiBold" />
+
+                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Theme" VerticalAlignment="Center" />
+                    <ComboBox Grid.Row="0" Grid.Column="1"
+                              AutomationProperties.AutomationId="ThemeComboBox"
+                              ItemsSource="{Binding Themes}"
+                              SelectedItem="{Binding Theme}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Startup behavior" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                              AutomationProperties.AutomationId="StartupBehaviorComboBox"
+                              ItemsSource="{Binding StartupBehaviors}"
+                              SelectedItem="{Binding StartupBehavior}"
+                              Margin="0,8,0,0" />
+                </Grid>
+
+                <Separator />
+
+                <TextBlock Text="Browser"
+                           FontWeight="SemiBold" />
+
+                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Homepage" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             AutomationProperties.AutomationId="HomepageTextBox"
+                             Text="{Binding Homepage}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Search engine" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                              AutomationProperties.AutomationId="SearchEngineComboBox"
+                              ItemsSource="{Binding SearchEngines}"
+                              SelectedItem="{Binding SearchEngine}"
+                              Margin="0,8,0,0" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Downloads folder" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             AutomationProperties.AutomationId="DownloadDirectoryTextBox"
+                             Text="{Binding DownloadDirectory}"
+                             PlaceholderText="Default downloads folder"
+                             Margin="0,8,0,0" />
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>
